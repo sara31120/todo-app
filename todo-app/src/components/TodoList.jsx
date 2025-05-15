@@ -6,7 +6,7 @@ import AddTodo from "./AddTodo";
 import TodoItem from "./TodoItem";
 import { Sun, Moon } from "lucide-react";
 
-const TodoList = ({ darkMode, setDarkMode }) => {
+const TodoList = ({ toggleDarkMode }) => {
   const [todos, setTodos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("All");
@@ -79,14 +79,12 @@ const TodoList = ({ darkMode, setDarkMode }) => {
   const handleSearchEnter = () => {
     if (searchTerm.trim() && filteredTodos.length === 0) {
       navigate("/empty", {
-        state: { searchTerm, filter, darkMode },
+        state: { searchTerm, filter },
       });
     }
   };
 
-  const toggleDarkMode = () => {
-    setDarkMode((prev) => !prev);
-  };
+  const isDarkMode = document.documentElement.classList.contains("dark");
 
   return (
     <div className="max-w-xl mx-auto mt-0 px-4 min-h-screen bg-background text-textDark dark:bg-gray-900 dark:text-white transition-colors relative">
@@ -103,7 +101,7 @@ const TodoList = ({ darkMode, setDarkMode }) => {
           onClick={toggleDarkMode}
           className="h-10 w-10 flex items-center justify-center bg-brand dark:bg-gray-700 rounded text-white hover:brightness-110 transition"
         >
-          {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+          {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
         </button>
       </div>
 
