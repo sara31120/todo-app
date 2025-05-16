@@ -1,12 +1,20 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
+import { updateTodo } from "../utils/todoApi";
 
-const EditTodo = ({ todo, onUpdate, onClose }) => {
+const EditTodo = ({ todo, onSave, onCancel }) => {
   const [newTitle, setNewTitle] = useState(todo.title);
 
-  const handleUpdate = () => {
-    if (newTitle.trim()) {
-      onUpdate(todo.id, newTitle.trim());
-      onClose();
+  const handleUpdate = async () => {
+    const trimmedTitle = newTitle.trim();
+    if (trimmedTitle) {
+      try {
+        await updateTodo(todo.id, trimmedTitle);
+        onSave(todo.id, trimmedTitle); // Use onSave instead of onUpdate
+        onCancel(); // Use onCancel instead of onClose
+      } catch (error) {
+        console.error("Failed to update todo:", error);
+      }
     }
   };
 
@@ -22,7 +30,7 @@ const EditTodo = ({ todo, onUpdate, onClose }) => {
         />
         <div className="flex justify-end gap-3 mt-6">
           <button
-            onClick={onClose}
+            onClick={onCancel}
             className="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-textDark dark:text-white rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition"
           >
             Cancel
@@ -37,6 +45,12 @@ const EditTodo = ({ todo, onUpdate, onClose }) => {
       </div>
     </div>
   );
+};
+
+EditTodo.propTypes = {
+  todo: PropTypes.object.isRequired,
+  onSave: PropTypes.func.isRequired,
+  onCancel: PropTypes.func.isRequired,
 };
 
 export default EditTodo;

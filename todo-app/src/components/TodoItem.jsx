@@ -1,7 +1,8 @@
 import React from "react";
+import PropTypes from "prop-types";
 import { Pencil, Trash2 } from "lucide-react";
 
-const TodoItem = ({ todo, toggleTodo, deleteTodo, editTodo, index }) => {
+const TodoItem = ({ todo, onToggle, onDelete, onEdit, index }) => {
   const showBorder = index === 0 || index === 1;
 
   return (
@@ -14,10 +15,9 @@ const TodoItem = ({ todo, toggleTodo, deleteTodo, editTodo, index }) => {
         <input
           type="checkbox"
           checked={todo.completed}
-          onChange={() => toggleTodo(todo.id, todo.completed)}
+          onChange={() => onToggle(todo.id, !todo.completed)}
           className="accent-brand w-5 h-5 cursor-[url('/cursor.jpg'),_pointer]"
         />
-
         <span
           className={`text-base font-medium transition-colors ${
             todo.completed
@@ -30,16 +30,15 @@ const TodoItem = ({ todo, toggleTodo, deleteTodo, editTodo, index }) => {
       </div>
       <div className="flex items-center gap-3">
         <button
-          onClick={() => {
-            const newTitle = prompt("Edit task", todo.title);
-            if (newTitle?.trim()) editTodo(todo.id, newTitle.trim());
-          }}
+          onClick={() => onEdit(todo)}
+          aria-label="Edit task"
           className="text-gray-400 dark:text-gray-400 hover:text-brand dark:hover:text-brand"
         >
           <Pencil size={18} />
         </button>
         <button
-          onClick={() => deleteTodo(todo.id)}
+          onClick={() => onDelete(todo.id)}
+          aria-label="Delete task"
           className="text-gray-400 dark:text-gray-400 hover:text-brand dark:hover:text-brand"
         >
           <Trash2 size={18} />
@@ -47,6 +46,18 @@ const TodoItem = ({ todo, toggleTodo, deleteTodo, editTodo, index }) => {
       </div>
     </li>
   );
+};
+
+TodoItem.propTypes = {
+  todo: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    title: PropTypes.string.isRequired,
+    completed: PropTypes.bool.isRequired,
+  }).isRequired,
+  onToggle: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired,
+  onEdit: PropTypes.func.isRequired,
+  index: PropTypes.number,
 };
 
 export default TodoItem;

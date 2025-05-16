@@ -1,135 +1,167 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import SearchBar from "./SearchBar";
 import FilterDropdown from "./FilterDropdown";
 import AddTodo from "./AddTodo";
 import TodoItem from "./TodoItem";
+import EditTodo from "./EditTodo";
+import EmptyResults from "./EmptyResults";
 import { Sun, Moon } from "lucide-react";
+import {
+  fetchTodos,
+  addTodo,
+  toggleTodo,
+  deleteTodo,
+  editTodo,
+} from "../utils/todoApi";
 
-const TodoList = ({ toggleDarkMode }) => {
+const ToDoList = () => {
   const [todos, setTodos] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [filter, setFilter] = useState("All");
+  const [darkMode, setDarkMode] = useState(() => {
+    return localStorage.getItem("theme") === "dark";
+  });
   const [showAddModal, setShowAddModal] = useState(false);
-
-  const navigate = useNavigate();
+  const [editingTodo, setEditingTodo] = useState(null);
 
   useEffect(() => {
-    fetchTodos();
+    const html = document.documentElement;
+    if (darkMode) {
+      html.classList.add("dark");
+      localStorage.setItem("theme", "dark");
+    } else {
+      html.classList.remove("dark");
+      localStorage.setItem("theme", "light");
+    }
+  }, [darkMode]);
+
+  useEffect(() => {
+    loadTodos();
   }, []);
 
-  const fetchTodos = async () => {
+  const loadTodos = async () => {
     try {
-      const res = await fetch("http://localhost:5001/todos");
-      const data = await res.json();
+      const data = await fetchTodos();
       setTodos(data);
     } catch (error) {
-      console.error("Failed to fetch todos:", error);
+      console.error("Error fetching todos:", error);
     }
   };
 
-  const handleAddTodo = async (title) => {
+  const handleAdd = async (title) => {
     try {
-      await fetch("http://localhost:5001/todos", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title, completed: false }),
-      });
-      fetchTodos();
+      await addTodo(title);
+      const updated = await fetchTodos();
+      setTodos(updated);
     } catch (error) {
-      console.error("Failed to add todo:", error);
+      console.error("Error adding todo:", error);
     }
   };
 
-  const toggleTodo = async (id, completed) => {
-    await fetch(`http://localhost:5001/todos/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ completed: !completed }),
-    });
-    fetchTodos();
-  };
-
-  const deleteTodo = async (id) => {
-    await fetch(`http://localhost:5001/todos/${id}`, {
-      method: "DELETE",
-    });
-    fetchTodos();
-  };
-
-  const editTodo = async (id, title) => {
-    await fetch(`http://localhost:5001/todos/${id}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title }),
-    });
-    fetchTodos();
-  };
-
-  const filteredTodos = todos
-    .filter((todo) => {
-      if (filter === "Completed") return todo.completed;
-      if (filter === "Active") return !todo.completed;
-      return true;
-    })
-    .filter((todo) =>
-      todo.title.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-
-  const handleSearchEnter = () => {
-    if (searchTerm.trim() && filteredTodos.length === 0) {
-      navigate("/empty", {
-        state: { searchTerm, filter },
-      });
+  const handleToggle = async (id, completed) => {
+    try {
+      await toggleTodo(id, completed);
+      await loadTodos();
+    } catch (error) {
+      console.error("Error updating todo:", error);
     }
   };
 
-  const isDarkMode = document.documentElement.classList.contains("dark");
+  const handleDelete = async (id) => {
+    try {
+      await deleteTodo(id);
+      await loadTodos();
+    } catch (error) {
+      console.error("Error deleting todo:", error);
+    }
+  };
+
+  const handleEdit = async (id, newTitle) => {
+    try {
+      await editTodo(id, newTitle);
+      await loadTodos();
+      setEditingTodo(null);
+    } catch (error) {
+      console.error("Error editing todo:", error);
+    }
+  };
+
+  const filteredTodos = todos.filter((todo) => {
+    const title = todo?.title?.toLowerCase?.() || "";
+    const matchesSearch = title.includes(searchTerm.toLowerCase());
+    const matchesFilter =
+      filter === "All" ||
+      (filter === "Active" && !todo.completed) ||
+      (filter === "Completed" && todo.completed);
+    return matchesSearch && matchesFilter;
+  });
+
+  // Instead of navigating away on no results, just update searchTerm state
+  const handleSearch = (term) => {
+    setSearchTerm(term);
+  };
 
   return (
-    <div className="max-w-xl mx-auto mt-0 px-4 min-h-screen bg-background text-textDark dark:bg-gray-900 dark:text-white transition-colors relative">
+    <div className="max-w-xl mx-auto mt-0 px-4 bg-background dark:bg-gray-900 text-textDark dark:text-white min-h-screen flex flex-col">
       <h1 className="text-3xl font-bold text-center mb-6">TODO LIST</h1>
 
-      <div className="flex justify-center items-center gap-4 mb-6">
-        <SearchBar
-          searchTerm={searchTerm}
-          setSearchTerm={setSearchTerm}
-          onSearchEnter={handleSearchEnter}
-        />
-        <FilterDropdown filter={filter} setFilter={setFilter} />
-        <button
-          onClick={toggleDarkMode}
-          className="h-10 w-10 flex items-center justify-center bg-brand dark:bg-gray-700 rounded text-white hover:brightness-110 transition"
-        >
-          {isDarkMode ? <Sun size={20} /> : <Moon size={20} />}
-        </button>
+      <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3 mb-6">
+        <div className="flex-grow">
+          <SearchBar searchTerm={searchTerm} setSearchTerm={handleSearch} />
+        </div>
+        <div className="flex items-center gap-3 mt-7 sm:mt-0">
+          <FilterDropdown filter={filter} setFilter={setFilter} />
+          <button
+            onClick={() => setDarkMode(!darkMode)}
+            className="h-10 w-10 flex items-center justify-center bg-brand dark:bg-gray-700 rounded text-white hover:brightness-110 transition"
+          >
+            {darkMode ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+        </div>
       </div>
 
-      <ul className="space-y-3">
-        {filteredTodos.map((todo, index) => (
-          <TodoItem
-            key={todo.id}
-            todo={todo}
-            index={index}
-            toggleTodo={toggleTodo}
-            deleteTodo={deleteTodo}
-            editTodo={editTodo}
+      <div className="flex flex-col gap-3 flex-grow">
+        {filteredTodos.length > 0 ? (
+          filteredTodos.map((todo, index) =>
+            editingTodo?.id === todo.id ? (
+              <EditTodo
+                key={todo.id}
+                todo={todo}
+                onSave={handleEdit}
+                onCancel={() => setEditingTodo(null)}
+              />
+            ) : (
+              <TodoItem
+                key={todo.id}
+                todo={todo}
+                index={index}
+                onToggle={handleToggle}
+                onDelete={handleDelete}
+                onEdit={() => setEditingTodo(todo)}
+              />
+            )
+          )
+        ) : (
+          <EmptyResults
+            searchTerm={searchTerm}
+            filter={filter}
+            darkMode={darkMode}
           />
-        ))}
-      </ul>
+        )}
+      </div>
 
       <button
         onClick={() => setShowAddModal(true)}
-        className="fixed bottom-6 right-6 bg-brand text-white text-4xl w-14 h-14 rounded-full shadow-lg hover:brightness-110 z-50 transition"
+        className="fixed bottom-8 right-6 bg-brand text-white text-3xl w-12 h-12 rounded-full shadow-lg hover:brightness-110 z-50 flex items-center justify-center"
       >
         +
       </button>
 
       {showAddModal && (
-        <AddTodo onAdd={handleAddTodo} onClose={() => setShowAddModal(false)} />
+        <AddTodo onAdd={handleAdd} onClose={() => setShowAddModal(false)} />
       )}
     </div>
   );
 };
 
-export default TodoList;
+export default ToDoList;

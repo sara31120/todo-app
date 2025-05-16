@@ -11,9 +11,9 @@
       "completed": false
     },
     {
-      "id": "3",
       "title": "NOTE #3",
-      "completed": false
+      "completed": false,
+      "id": "3"
     }
   ]
 }

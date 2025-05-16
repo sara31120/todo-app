@@ -1,11 +1,13 @@
 import React, { useState } from "react";
+import PropTypes from "prop-types";
 
 const AddTodo = ({ onAdd, onClose }) => {
   const [title, setTitle] = useState("");
 
   const handleSubmit = () => {
-    if (title.trim()) {
-      onAdd(title.trim());
+    const trimmedTitle = title.trim();
+    if (trimmedTitle) {
+      onAdd(trimmedTitle); 
       setTitle("");
       onClose();
     }
@@ -39,6 +41,11 @@ const AddTodo = ({ onAdd, onClose }) => {
       </div>
     </div>
   );
+};
+
+AddTodo.propTypes = {
+  onAdd: PropTypes.func.isRequired,
+  onClose: PropTypes.func.isRequired,
 };
 
 export default AddTodo;
