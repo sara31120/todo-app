@@ -10,8 +10,8 @@ const EditTodo = ({ todo, onSave, onCancel }) => {
     if (trimmedTitle) {
       try {
         await updateTodo(todo.id, trimmedTitle);
-        onSave(todo.id, trimmedTitle); // Use onSave instead of onUpdate
-        onCancel(); // Use onCancel instead of onClose
+        onSave(todo.id, trimmedTitle);
+        onCancel();
       } catch (error) {
         console.error("Failed to update todo:", error);
       }

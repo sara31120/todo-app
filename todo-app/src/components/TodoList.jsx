@@ -96,7 +96,6 @@ const ToDoList = () => {
     return matchesSearch && matchesFilter;
   });
 
-  // Instead of navigating away on no results, just update searchTerm state
   const handleSearch = (term) => {
     setSearchTerm(term);
   };

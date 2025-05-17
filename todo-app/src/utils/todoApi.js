@@ -21,7 +21,7 @@ export const toggleTodo = async (id, completed) => {
   const res = await fetch(`${API_URL}/${id}`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ completed }), // ✅ fix here
+    body: JSON.stringify({ completed }),
   });
   if (!res.ok) throw new Error("Failed to update todo");
   return res.json();
