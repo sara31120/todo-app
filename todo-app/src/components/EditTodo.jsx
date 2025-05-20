@@ -20,18 +20,18 @@ const EditTodo = ({ todo, onSave, onCancel }) => {
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex justify-center items-center z-50">
-      <div className="bg-background dark:bg-gray-900 text-textDark dark:text-white p-6 rounded-xl w-full max-w-sm shadow-xl">
+      <div className="bg-[rgb(var(--color-card))] text-[rgb(var(--color-text))] p-6 rounded-xl w-full max-w-sm shadow-xl">
         <h2 className="text-xl font-bold mb-4 text-center">Edit Note</h2>
         <input
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
-          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-700 rounded-md bg-white dark:bg-gray-800 text-textDark dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand"
+          className="w-full px-4 py-3 border border-gray-300 rounded-md bg-transparent text-[rgb(var(--color-text))] placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand"
           placeholder="Update your task..."
         />
         <div className="flex justify-end gap-3 mt-6">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-textDark dark:text-white rounded hover:bg-gray-300 dark:hover:bg-gray-600 transition"
+            className="px-4 py-2 text-sm bg-gray-400 text-[rgb(var(--color-text))] rounded hover:bg-gray-300 transition"
           >
             Cancel
           </button>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import SearchBar from "./SearchBar";
 import FilterDropdown from "./FilterDropdown";
 import AddTodo from "./AddTodo";
@@ -6,86 +6,24 @@ import TodoItem from "./TodoItem";
 import EditTodo from "./EditTodo";
 import EmptyResults from "./EmptyResults";
 import { Sun, Moon } from "lucide-react";
-import {
-  fetchTodos,
-  addTodo,
-  toggleTodo,
-  deleteTodo,
-  editTodo,
-} from "../utils/todoApi";
 
-const ToDoList = () => {
-  const [todos, setTodos] = useState([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filter, setFilter] = useState("All");
-  const [darkMode, setDarkMode] = useState(() => {
-    return localStorage.getItem("theme") === "dark";
-  });
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [editingTodo, setEditingTodo] = useState(null);
-
-  useEffect(() => {
-    const html = document.documentElement;
-    if (darkMode) {
-      html.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      html.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
-  }, [darkMode]);
-
-  useEffect(() => {
-    loadTodos();
-  }, []);
-
-  const loadTodos = async () => {
-    try {
-      const data = await fetchTodos();
-      setTodos(data);
-    } catch (error) {
-      console.error("Error fetching todos:", error);
-    }
-  };
-
-  const handleAdd = async (title) => {
-    try {
-      await addTodo(title);
-      const updated = await fetchTodos();
-      setTodos(updated);
-    } catch (error) {
-      console.error("Error adding todo:", error);
-    }
-  };
-
-  const handleToggle = async (id, completed) => {
-    try {
-      await toggleTodo(id, completed);
-      await loadTodos();
-    } catch (error) {
-      console.error("Error updating todo:", error);
-    }
-  };
-
-  const handleDelete = async (id) => {
-    try {
-      await deleteTodo(id);
-      await loadTodos();
-    } catch (error) {
-      console.error("Error deleting todo:", error);
-    }
-  };
-
-  const handleEdit = async (id, newTitle) => {
-    try {
-      await editTodo(id, newTitle);
-      await loadTodos();
-      setEditingTodo(null);
-    } catch (error) {
-      console.error("Error editing todo:", error);
-    }
-  };
-
+const ToDoList = ({
+  todos = [],
+  searchTerm,
+  setSearchTerm,
+  filter,
+  setFilter,
+  darkMode,
+  toggleDarkMode,
+  showAddModal,
+  setShowAddModal,
+  editingTodo,
+  setEditingTodo,
+  handleAdd,
+  handleToggle,
+  handleDelete,
+  handleEdit,
+}) => {
   const filteredTodos = todos.filter((todo) => {
     const title = todo?.title?.toLowerCase?.() || "";
     const matchesSearch = title.includes(searchTerm.toLowerCase());
@@ -96,23 +34,19 @@ const ToDoList = () => {
     return matchesSearch && matchesFilter;
   });
 
-  const handleSearch = (term) => {
-    setSearchTerm(term);
-  };
-
   return (
-    <div className="max-w-xl mx-auto mt-0 px-4 bg-background dark:bg-gray-900 text-textDark dark:text-white min-h-screen flex flex-col">
+    <div className="max-w-xl mx-auto mt-0 px-4 bg-[rgb(var(--color-bg))] text-[rgb(var(--color-text))] min-h-screen flex flex-col">
       <h1 className="text-3xl font-bold text-center mb-6">TODO LIST</h1>
 
       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-3 mb-6">
         <div className="flex-grow">
-          <SearchBar searchTerm={searchTerm} setSearchTerm={handleSearch} />
+          <SearchBar searchTerm={searchTerm} setSearchTerm={setSearchTerm} />
         </div>
         <div className="flex items-center gap-3 mt-7 sm:mt-0">
           <FilterDropdown filter={filter} setFilter={setFilter} />
           <button
-            onClick={() => setDarkMode(!darkMode)}
-            className="h-10 w-10 flex items-center justify-center bg-brand dark:bg-gray-700 rounded text-white hover:brightness-110 transition"
+            onClick={toggleDarkMode}
+            className="h-10 w-10 flex items-center justify-center bg-brand rounded text-white hover:brightness-110 transition"
           >
             {darkMode ? <Sun size={20} /> : <Moon size={20} />}
           </button>

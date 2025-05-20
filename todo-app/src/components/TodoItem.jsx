@@ -7,8 +7,8 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit, index }) => {
 
   return (
     <li
-      className={`flex justify-between items-center px-4 py-3 transition-colors bg-transparent dark:bg-gray-800 ${
-        showBorder ? "border-b border-brand dark:border-gray-600" : ""
+      className={`flex justify-between items-center px-4 py-3 transition-colors bg-transparent ${
+        showBorder ? "border-b border-brand" : ""
       }`}
     >
       <div className="flex items-center gap-3">
@@ -21,8 +21,8 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit, index }) => {
         <span
           className={`text-base font-medium transition-colors ${
             todo.completed
-              ? "line-through text-gray-400 dark:text-gray-500"
-              : "text-textDark dark:text-white"
+              ? "line-through text-[rgb(var(--color-muted))]"
+              : "text-[rgb(var(--color-text))]"
           }`}
         >
           {todo.title}
@@ -32,14 +32,14 @@ const TodoItem = ({ todo, onToggle, onDelete, onEdit, index }) => {
         <button
           onClick={() => onEdit(todo)}
           aria-label="Edit task"
-          className="text-gray-400 dark:text-gray-400 hover:text-brand dark:hover:text-brand"
+          className="text-[rgb(var(--color-muted))] hover:text-brand"
         >
           <Pencil size={18} />
         </button>
         <button
           onClick={() => onDelete(todo.id)}
           aria-label="Delete task"
-          className="text-gray-400 dark:text-gray-400 hover:text-brand dark:hover:text-brand"
+          className="text-[rgb(var(--color-muted))] hover:text-brand"
         >
           <Trash2 size={18} />
         </button>

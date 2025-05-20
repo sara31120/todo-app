@@ -7,3 +7,13 @@ body {
   margin: 0;
   padding: 0;
 }
+
+:root {
+  --color-bg: #f7f7f7;
+  --color-text: #252525;
+}
+
+.dark {
+  --color-bg: #1f1f1f;
+  --color-text: #ffffff;
+}
